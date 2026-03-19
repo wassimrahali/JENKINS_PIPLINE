@@ -1,10 +1,5 @@
 pipeline {
-    agent {
-        docker {
-            image 'node:18'
-            args '-u root:root' // ensure permission for Docker commands if needed
-        }
-    }
+    agent any
 
     environment {
         DOCKER_IMAGE = "wassimrahali/backend-8guess"
@@ -13,7 +8,7 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                git branch: 'main', url: 'https://github.com/wassimrahali/JENKINS_PIPLINE.git'
+                git branch: 'main', url: 'https://github.com/wassimrahali/JENKINS_PIPELINE.git'
             }
         }
 
@@ -36,14 +31,12 @@ pipeline {
         }
 
         stage('Build Docker Image') {
-            agent any // Use a node with Docker installed
             steps {
                 sh 'docker build -t $DOCKER_IMAGE .'
             }
         }
 
         stage('Run Container (Deploy)') {
-            agent any // Use a node with Docker installed
             steps {
                 sh '''
                 docker rm -f app || true
