@@ -1,57 +1,39 @@
 pipeline {
     agent any
 
-    environment {
-        DOCKER_IMAGE = "wassimrahali/backend-8guess"
+    tools {
+        maven 'maven'
     }
 
     stages {
-        stage('Checkout') {
+
+        stage("Clean up") {
             steps {
-                git branch: 'main', url: 'https://github.com/wassimrahali/JENKINS_PIPLINE.git'
+                deleteDir()
             }
         }
 
-        stage('Install Dependencies') {
+        stage("Clone repo") {
             steps {
-                sh 'npm install'
+                sh "git clone https://github.com/MaBouz/exp1-spring.git"
             }
         }
 
-        stage('Build') {
+        stage("Generate backend image") {
             steps {
-                sh 'npm run build'
+                dir("exp1-spring") {
+                    sh "mvn clean install"
+                    sh "docker build -t docexp1-spring ."
+                }
             }
         }
 
-        stage('Test') {
+        stage("Run docker compose") {
             steps {
-                sh 'npm test'
+                dir("exp1-spring") {
+                    sh "docker compose up -d"
+                }
             }
-        }
-
-        stage('Build Docker Image') {
-            steps {
-                sh 'docker build -t $DOCKER_IMAGE .'
-            }
-        }
-
-        stage('Run Container (Deploy)') {
-            steps {
-                sh '''
-                docker rm -f app || true
-                docker run -d -p 3000:3000 --name app $DOCKER_IMAGE
-                '''
-            }
-        }
-    }
-
-    post {
-        success {
-            echo '✅ Pipeline succeeded'
-        }
-        failure {
-            echo '❌ Pipeline failed'
         }
     }
 }
