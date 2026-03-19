@@ -1,5 +1,5 @@
 pipeline {
-    agent any
+    agent { label 'docker-node' } // run all stages on this node
 
     tools {
         maven 'maven'
