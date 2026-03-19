@@ -1,29 +1,57 @@
-pipeline{
+pipeline {
     agent any
-    
-    stages{
-        stage('Hello'){
-            steps{
-                echo 'Hello World'
+
+    environment {
+        DOCKER_IMAGE = "wassimrahali/app"
+    }
+
+    stages {
+
+        stage('Checkout') {
+            steps {
+                git branch: 'main', url: 'https://github.com/wassimrahali/JENKINS_PIPELINE.git'
             }
         }
-        
-        stage('Dev'){
-            steps{
-                echo 'Dev'
+
+        stage('Build') {
+            steps {
+                echo 'Building project...'
+                // Example for Node.js
+                sh 'npm install'
             }
         }
-        
-        stage ('Test'){
-            steps{
-                echo 'Testing'
+
+        stage('Test') {
+            steps {
+                echo 'Running tests...'
+                sh 'npm test'
             }
         }
-        
-        stage ('Deploy'){
-            steps{
-                echo 'Mise en prod'
+
+        stage('Build Docker Image') {
+            steps {
+                echo 'Building Docker image...'
+                sh 'docker build -t $DOCKER_IMAGE .'
             }
+        }
+
+        stage('Run Container (Deploy)') {
+            steps {
+                echo 'Deploying app...'
+                sh '''
+                docker rm -f app || true
+                docker run -d -p 3000:3000 --name app $DOCKER_IMAGE
+                '''
+            }
+        }
+    }
+
+    post {
+        success {
+            echo '✅ Pipeline succeeded'
+        }
+        failure {
+            echo '❌ Pipeline failed'
         }
     }
 }
