@@ -1,3 +1,32 @@
+
+pipeline {
+    agent {
+        docker {
+            image 'node:18'
+        }
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                git 'https://github.com/wassimrahali/JENKINS_PIPELINE.git'
+            }
+        }
+
+        stage('Install') {
+            steps {
+                sh 'npm install'
+            }
+        }
+
+        stage('Build') {
+            steps {
+                sh 'npm run build'
+            }
+        }
+    }
+}
+
 pipeline {
     agent any
 
