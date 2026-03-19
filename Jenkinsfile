@@ -1,5 +1,5 @@
 pipeline {
-    agent { label 'docker-node' } // run all stages on this node
+    agent { label 'docker-node' }
 
     tools {
         maven 'maven'
@@ -15,15 +15,15 @@ pipeline {
 
         stage("Clone repo") {
             steps {
-                sh "git clone https://github.com/MaBouz/exp1-spring.git"
+                bat "git clone https://github.com/MaBouz/exp1-spring.git"
             }
         }
 
         stage("Generate backend image") {
             steps {
                 dir("exp1-spring") {
-                    sh "mvn clean install"
-                    sh "docker build -t docexp1-spring ."
+                    bat "mvn clean install"
+                    bat "docker build -t docexp1-spring ."
                 }
             }
         }
@@ -31,7 +31,7 @@ pipeline {
         stage("Run docker compose") {
             steps {
                 dir("exp1-spring") {
-                    sh "docker compose up -d"
+                    bat "docker compose up -d"
                 }
             }
         }
